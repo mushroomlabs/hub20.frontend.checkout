@@ -1,0 +1,7 @@
+export const settings = {
+  serverUrl: 'https://demo.hub20.io',
+  storeId: 'your-store-id',
+  amount: 10,
+}
+
+export default settings
