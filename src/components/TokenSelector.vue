@@ -5,7 +5,7 @@
       {{ chargeAmount | formattedCurrency(chargeCurrencyCode) }}
     </h6>
     <ul class="token-selector-options">
-      <TokenSelectorItem v-for="tokenAddress in acceptedTokens" :key="tokenAddress" :tokenAddress="tokenAddress" />
+      <TokenSelectorItem v-for="token in acceptedTokens" :key="token.address" :token="token" />
     </ul>
   </div>
 </template>
