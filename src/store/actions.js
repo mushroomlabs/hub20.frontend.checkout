@@ -1,34 +1,4 @@
-export const actions = {
-  async fetchAllTokenData({commit, state, dispatch}) {
-    let tokenAddresses = state.store.accepted_currencies
-    tokenAddresses.forEach(async function (address) {
-      let token = await dispatch('fetchToken', address)
-      commit('setToken', token)
-
-      let rate = await dispatch('fetchExchangeRate', token)
-      commit('setExchangeRate', {token, rate})
-    })
-  },
-  async fetchToken({state}, tokenAddress) {
-    let url = `${state.apiRootUrl}/api/tokens/token/${tokenAddress}`
-    let response = await fetch(url)
-    return await response.json()
-  },
-  async fetchTokenLogo(_, token) {
-    return await Coingecko.getTokenLogo(token)
-  },
-  async fetchExchangeRate({state, dispatch}, token) {
-    try {
-      if (Erc20.isErc20Token(token)) {
-        return await Coingecko.getTokenRate(token, state.pricingCurrency)
-      } else {
-        return await Coingecko.getEthereumRate(state.pricingCurrency)
-      }
-    } catch (error) {
-      let message = `Failed to get exchange rate for ${token.code}`
-      dispatch('handleError', {error, message})
-    }
-  },
+export const actions =
   async reset({commit, state}) {
     if (state && state.checkout && state.checkout.url) {
       await fetch(state.checkout.url, {

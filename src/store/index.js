@@ -28,19 +28,23 @@ const initialState = () => ({
   checkout: null,
   extraOptions: null,
   isFinalized: false,
-  charge: null,
+  charge: null
 })
 
 const getters = {
   isLoaded: state => Boolean(state.merchantStore),
   isReady: (state, getters) => getters.isLoaded && Boolean(state.checkout),
   storeId: state => state.merchantStore && state.merchantStore.id,
-  acceptedTokens: state => state.merchantStore && state.merchantStore.accepted_currencies,
   onCheckoutCanceled: state => state.extraOptions && state.extraOptions.onCheckoutCanceled,
   onCheckoutFinished: state => state.extraOptions && state.extraOptions.onCheckoutFinished,
   checkoutId: state => state.checkout && state.checkout.id,
   chargeCurrencyCode: state => state.charge && state.charge.currencyCode,
   chargeAmount: state => state.charge && state.charge.amount,
+  acceptedTokens(state, getters, rootState) {
+    let allTokens = rootState.tokens.tokens
+    let tokenUrls = state.merchantStore && state.merchantStore.accepted_currencies
+    return tokenUrls && allTokens && allTokens.filter(t => tokenUrls.includes(t.url))
+  }
 }
 
 const mutations = {
@@ -77,22 +81,23 @@ const actions = {
     return dispatch('server/setUrl', url)
   },
   setStore({commit}, storeId) {
-    api.stores.get(storeId).then(({data}) => commit(STORE_SET, data))
+    return api.stores.get(storeId).then(({data}) => commit(STORE_SET, data))
   },
   createCheckout({commit, state}, {token, amountDue, externalIdentifier}) {
-    api.stores
+    return api.stores
       .createCheckout(token, state.merchantStore, amountDue, externalIdentifier)
       .then(({data}) => commit(CHECKOUT_SET_DATA, data))
   },
   fetchCheckout({commit}, checkoutId) {
-    api.stores.fetchCheckout(checkoutId).then(({data}) => commit(CHECKOUT_SET_DATA, data))
+    return api.stores.fetchCheckout(checkoutId).then(({data}) => commit(CHECKOUT_SET_DATA, data))
   },
-  initialize({commit, dispatch}, {serverUrl, storeId, charge}) {
-    return dispatch('coingecko/initialize')
+  initialize({commit, dispatch, getters}, {serverUrl, storeId, charge}) {
+    return dispatch('coingecko/fetchCoingeckoTokenList')
       .then(() => dispatch('setServer', serverUrl))
       .then(() => dispatch('setStore', storeId))
       .then(() => dispatch('tokens/initialize'))
       .then(() => commit(CHARGE_SET_DATA, charge))
+      .then(() => dispatch('refresh'))
   },
   refresh({dispatch, getters}) {
     getters.acceptedTokens.forEach(token => dispatch('coingecko/fetchRate', token))
