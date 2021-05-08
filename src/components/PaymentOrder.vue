@@ -1,7 +1,7 @@
 <template>
-<div class='payment-order' v-if='paymentOrder'>
+<div class='payment-order'>
   <h1>
-    Payment to <span class='store'>{{ store.name }}</span>
+    Payment to <span class='store'>{{ merchantStore.name }}</span>
   </h1>
   <PaymentOrderStatus/>
   <PaymentOrderDetails/>
@@ -35,7 +35,7 @@ import PaymentOrderStatus from './PaymentOrderStatus.vue'
      },
      computed:{
          ...mapGetters(['paymentOrder']),
-         ...mapState(['store'])
+         ...mapState(['merchantStore'])
      }
  }
 </script>
