@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js-light'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createLogger from 'vuex/dist/logger'
@@ -28,7 +29,7 @@ const initialState = () => ({
   checkout: null,
   extraOptions: null,
   isFinalized: false,
-  charge: null
+  charge: null,
 })
 
 const getters = {
@@ -40,7 +41,13 @@ const getters = {
   checkoutId: state => state.checkout && state.checkout.id,
   chargeCurrencyCode: state => state.charge && state.charge.currencyCode,
   chargeAmount: state => state.charge && state.charge.amount,
-  acceptedTokens(state, getters, rootState) {
+  externalIdentifier: state => state.charge && state.charge.externalIdentifier,
+  tokenAmountDue: (state, getters, _, rootGetters) => token => {
+    let exchangeRate = rootGetters['coingecko/exchangeRate'](token)
+    let tokenAmount = getters.chargeAmount && (getters.chargeAmount / exchangeRate)
+    return tokenAmount && Decimal(tokenAmount).toDecimalPlaces(token.decimals)
+  },
+  acceptedTokens: (state, getters, rootState) => {
     let allTokens = rootState.tokens.tokens
     let tokenUrls = state.merchantStore && state.merchantStore.accepted_currencies
     return tokenUrls && allTokens && allTokens.filter(t => tokenUrls.includes(t.url))
@@ -83,16 +90,19 @@ const actions = {
   setStore({commit}, storeId) {
     return api.stores.get(storeId).then(({data}) => commit(STORE_SET, data))
   },
-  createCheckout({commit, state}, {token, amountDue, externalIdentifier}) {
-    return api.stores
-      .createCheckout(token, state.merchantStore, amountDue, externalIdentifier)
-      .then(({data}) => commit(CHECKOUT_SET_DATA, data))
+  startCheckout({commit, state, getters}, token) {
+    let tokenAmount = getters.tokenAmountDue(token)
+
+    return api.checkout
+              .create({storeData: state.merchantStore, externalIdentifier: getters.externalIdentifier, token, tokenAmount})
+              .then(({data}) => commit(CHECKOUT_SET_DATA, data))
   },
   fetchCheckout({commit}, checkoutId) {
     return api.stores.fetchCheckout(checkoutId).then(({data}) => commit(CHECKOUT_SET_DATA, data))
   },
   initialize({commit, dispatch, getters}, {serverUrl, storeId, charge}) {
     return dispatch('coingecko/fetchCoingeckoTokenList')
+      .then(() => dispatch('coingecko/setBaseCurrency', charge.currencyCode))
       .then(() => dispatch('setServer', serverUrl))
       .then(() => dispatch('setStore', storeId))
       .then(() => dispatch('tokens/initialize'))

@@ -5,7 +5,7 @@
       Total to Pay:
       <TokenAmountDisplay
         :token="token"
-        :amount="this.chargeAmount"
+        :amount="this.tokenAmountDue(token)"
         :max-significant-digits="6"
       />
     </div>
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import Decimal from 'decimal.js-light'
 import {mapGetters, mapActions} from 'vuex'
 
 import TokenAmountDisplay from './TokenAmountDisplay.vue'
@@ -26,16 +27,18 @@ export default {
     token: Object,
   },
   computed: {
-    exchangeRateFormatted: function () {
-      let exchangeRate = this.exchangeRate(this.token)
+    currentRate() {
+      return this.exchangeRate(this.token)
+    },
+    exchangeRateFormatted() {
       let formatter = new Intl.NumberFormat([], {
         style: 'currency',
         currency: this.chargeCurrencyCode
       })
-      return `${formatter.format(exchangeRate)} / ${this.token.code}`
+      return `${formatter.format(this.currentRate)} / ${this.token.code}`
     },
     ...mapGetters('coingecko', ['exchangeRate']),
-    ...mapGetters(['chargeCurrencyCode', 'chargeAmount']),
+    ...mapGetters(['chargeCurrencyCode', 'chargeAmount', 'tokenAmountDue']),
   },
   methods: {
     ...mapActions('coingecko', ['fetchRate']),

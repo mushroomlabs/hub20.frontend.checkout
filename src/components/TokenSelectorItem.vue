@@ -1,4 +1,3 @@
-l
 <template>
   <li v-if="token" v-on:click="selectToken" class="token-selector-item">
     <span class="token-name">{{ token.name }}</span>
@@ -8,7 +7,7 @@ l
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import {mixins} from 'hub20-vue-sdk'
 
 import TokenExchangeRate from './TokenExchangeRate'
@@ -29,11 +28,9 @@ export default {
     ...mapGetters('coingecko', ['tokenLogoByAddress']),
   },
   methods: {
+    ...mapActions(['startCheckout']),
     selectToken: function () {
-      // this.$store.commit('selectToken', this.token)
-      // this.$store.dispatch('makeCheckout', this.token)
-
-      console.log('token selected')
+      this.startCheckout(this.token)
     }
   },
 }
