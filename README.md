@@ -2,39 +2,48 @@
 
 ## Intro
 
-[Hub20](https://github.com/mushroomlabs/hub20) is a self-hosted online payment solution allowing users to collect payments in Ethereum and any ERC20 token.
+[Hub20](https://gitlab.com/mushroomlabs/hub20) is a self-hosted online payment solution allowing users to collect payments in Ethereum and any ERC20 token.
 
-[Checkout20](https://github.com/mushroomlabs/hub20) is the frontend Javascript SDK, meant to run in any modern browser.
+[Checkout20](https://github.com/mushroomlabs/hub20/checkout20) is the frontend Javascript SDK, meant to run in any modern browser.
 
 ## Usage
 
 First you need to have an account at your Hub20 instance and define your store. To initiate a checkout:
 
 
-```
+```(html)
+
     <div id="hub20 store"></div>
 
     <script type="text/javascript">
      window.addEventListener('load', function() {
        new Hub20.checkout("#store", {
-         apiRootUrl: "https://your.hub20.example.com",
+         serverUrl: "https://your.hub20.example.com",
          storeId: "your-store-id-uuid",
-         currency: "USD",
-         amount: "2.50",
-         onError: function(error, message) {
-           console.error(message)
+         charge: {
+             currency: "USD",  // You can use any currency code
+             amount: "2.50",
+             externalIdentifier: "John Doe invoice #20"
          },
-         onNotification: function(message) {
-           alert(message)
-         },
-         onPaymentSent: function(voucher) {
-             uploadVoucherToSite(voucher)
-         },
-         onPaymentReceived: function(voucher) {
-             uploadVoucherToSite(voucher)
-         },
-         onPaymentConfirmed: function(voucher) {
-             uploadVoucherToSite(voucher)
+         options: {
+             onPaymentReceived: function(payment, checkout) {
+                console.log("TODO")
+             },
+             onPaymentSent: function(payment, checkout) {
+                console.log("TODO")
+             },
+             onPaymentConfirmed: function(payment, checkout) {
+                 console.log("TODO")
+             },
+             onComplete: function(checkout) {
+                console.log("You get all information about the checkout: routes, payments, etc")
+             },
+             onCanceled: function(checkout) {
+                 console.log("User has left this checkout")
+             },
+             onError: function(error, message) {
+                 console.error("Oh, Jimmy...")
+             }
          }
        })
      })
