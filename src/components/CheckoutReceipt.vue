@@ -5,16 +5,18 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 
 export default {
     name: 'CheckoutReceipt',
     computed: {
-        ...mapGetters(['paymentOrder']),
-        ...mapActions(['handleCheckoutFinished'])
+        ...mapGetters(['onCheckoutFinished', 'paymentOrder']),
+        ...mapState(['checkout'])
     },
-    mounted() {
-        this.handleCheckoutFinished()
+  mounted() {
+    if (this.onCheckoutFinished) {
+      this.onCheckoutFinished(this.checkout)
     }
+  }
 }
 </script>

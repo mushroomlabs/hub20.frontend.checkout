@@ -1,5 +1,5 @@
 <template>
-  <div class="token-selector">
+  <div v-if="chargeCurrencyCode && chargeAmount" class="token-selector">
     <h6 class="token-selector-payment-info">
       Select one of the following tokens to initiate a transfer equivalent to
       {{ chargeAmount | formattedCurrency(chargeCurrencyCode) }}
