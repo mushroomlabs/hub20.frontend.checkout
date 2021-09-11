@@ -1,7 +1,8 @@
 export const settings = {
-  serverUrl: 'https://demo.hub20.io',
+  serverUrl: 'https://demo.hub20.io', // The url of the instance you are using
   storeId: 'your-store-id',
   amount: 10,
+  currency: 'USD',  // ISO Code of the base (fiat) currency of your product
 }
 
 export default settings
