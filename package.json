@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve --watch",
     "build": "vue-cli-service build --target lib --name hub20 ./lib/main.js",
+    "dev": "vue-cli-service build --target lib --name hub20 ./lib/main.js --watch",
     "test:unit": "vue-cli-service test:unit",
     "test:unit:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --runInBand --watchAll",
     "lint": "vue-cli-service lint",
@@ -13,7 +14,7 @@
   "main": "./dist/hub20.umd.js",
   "dependencies": {
     "decimal.js-light": "^2.5.0",
-    "hub20-vue-sdk": "^0.0.2",
+    "hub20-vue-sdk": "^0.1",
     "jshashes": "^1.0.7",
     "qrcode": "^1.4.4",
     "vue": "^2.6.10",
