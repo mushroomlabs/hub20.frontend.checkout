@@ -34,8 +34,11 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "prettier": "^1.19.1",
+    "sass": "^1.42.1",
+    "sass-loader": "^7.1.0",
     "vue-jest": "^3.0.7",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "zenstyles": "^0.0.1"
   },
   "eslintConfig": {
     "root": true,

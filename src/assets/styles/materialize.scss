@@ -1,0 +1,201 @@
+@use 'zenstyles/src/material/colors';
+@use 'zenstyles/src/material/mixins';
+
+
+#hub20-checkout {
+
+    button {
+        @include mixins.button;
+        @include mixins.button-small;
+        @include mixins.waves-effect;
+        @include mixins.z-depth-1;
+        @include colors.color-palette();
+    }
+
+    li {
+        list-style-type: none;
+    }
+
+    [name=time-remaining-progress-bar] {
+        &.ok div.vue-simple-progress-bar {
+            background-color: green !important;
+        }
+
+        &.warning div.vue-simple-progress-bar {
+            background-color: yellow !important;
+        }
+
+        &.critical div.vue-simple-progress-bar {
+            background-color: red !important;
+        }
+    }
+
+    ul.token-selector-options {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-row-gap: 0.5vh;
+
+        li.token-selector-item {
+            @include mixins.card;
+            @include mixins.card-horizontal;
+
+            span.token-name {
+                @include mixins.card-title;
+            }
+
+            img {
+                @include mixins.card-image;
+                @include mixins.card-horizontal-image;
+            }
+
+            div.token-exchange-rate {
+                @include mixins.card-content
+            }
+
+            &:hover {
+                @include mixins.z-depth-5;
+                cursor: pointer;
+            }
+        }
+    }
+
+    div.payment-order {
+        display: grid;
+
+        grid-template-areas: 'status' 'routing';
+
+        h1, div.payment-order-details {
+            display: none;
+        }
+
+        div.payment-order-status {
+            grid-area: status;
+        }
+
+        ul.payment-order-routing {
+            $payment_method_width: 580px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax($payment_method_width, 1fr));
+            padding-inline-start: 0;
+            grid-area: routing;
+            grid-row-gap: 2vh;
+            grid-column-gap: 0.25rem;
+
+            .transfer {
+                cursor: pointer;
+                @include mixins.icon-after('content_copy');
+            }
+
+            span.payment-method {
+                display: block;
+                text-align: center;
+                font-size: 200%;
+                font-weight: 800;
+            }
+
+            div.payment-instructions {
+                color: #505050;
+                padding-top: 1em
+            }
+
+            li.payment-method {
+                max-width: $payment_method_width;
+                height: 325px;
+                display: grid;
+                grid-template-rows: 45px auto;
+                justify-self: center;
+
+                span.payment-method {
+                    grid-area: head;
+                }
+
+                canvas {
+                    grid-area: qrcode;
+                    width: 160px !important;
+                    height: 160px !important;
+                    justify-self: center;
+                    margin-top: 1vh;
+                }
+
+                .payment-instructions {
+                    grid-area: instructions;
+
+                    .transfer.address {
+                        display: block;
+                        font-weight: 800;
+                    }
+                }
+
+                .payment-order-web3-connector {
+                    grid-area: web3connector
+                }
+
+                &.ethereum {
+                    grid-template-areas: 'head head head head'
+                                             'instructions instructions instructions instructions'
+                                             'instructions instructions instructions instructions'
+                                             'qrcode qrcode qrcode qrcode'
+                                             '. web3connector web3connector .';
+                }
+
+                &.raiden {
+                    grid-template-areas: 'head'
+                                             'instructions'
+                    '.' '.' '.';
+                }
+
+            }
+
+            dl {
+                width: 100%;
+                display: grid;
+                grid-template-columns: minmax(160px, auto) minmax(360px, auto);
+                grid-template-rows: 2.5vh;
+            }
+
+            dt, dl {
+                height: 2.5vh;
+            }
+
+            dt {
+                &::after {
+                    content: ': ';
+                }
+            }
+
+            dd {
+                display: inline;
+                text-align: right;
+                margin-inline-start: 0;
+            }
+        }
+
+        div.payment-order-timer {
+            padding: 0 1em;
+            span.time-remaining-display {
+                display: block;
+                text-align: right;
+            }
+        }
+
+        div.payment-order-action-panel {
+            padding: 2vh 1em;
+        }
+
+        div.payment-order-transfers {
+            display: none;
+        }
+    }
+
+    div.checkout-receipt, div.checkout-expired {
+        display: grid;
+        justify-content: center;
+        @include mixins.flow-text;
+    }
+
+    div.checkout-receipt {
+        @include mixins.icon-after('check');
+    }
+}
