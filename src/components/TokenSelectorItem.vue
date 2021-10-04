@@ -29,9 +29,13 @@ export default {
   },
   methods: {
     ...mapActions(['startCheckout']),
+    ...mapActions('coingecko', ['fetchTokenLogoUrl']),
     selectToken: function () {
       this.startCheckout(this.token)
     }
   },
+  mounted() {
+    this.fetchTokenLogoUrl(this.token)
+  }
 }
 </script>
