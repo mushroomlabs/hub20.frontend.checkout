@@ -1,6 +1,7 @@
 module.exports = {
   chainWebpack: config => {
-    config.module
+    config
+      .module
       .rule('scss')
       .use('sass')
       .loader('vue-style-loader')
@@ -8,7 +9,20 @@ module.exports = {
         ...options,
         sourceMap: true,
         sourceMapContents: false
+      }));
+
+    config
+      .module
+      .rule('fonts')
+      .use('file-loader')
+      .loader('file-loader')
+      .tap(options => ({
+        ...options,
+        sourceMap: true,
+        sourceMapContents: false
       }))
+
+
   },
   css: {
     loaderOptions: {

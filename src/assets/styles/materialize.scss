@@ -1,201 +1,199 @@
-@use 'zenstyles/src/material/colors';
-@use 'zenstyles/src/material/mixins';
+@use 'sass:map';
+@use 'sass:color';
+@use 'zenstyles/src/material';
 
+@include material.ui;
 
 #hub20-checkout {
 
-    button {
-        @include mixins.button;
-        @include mixins.button-small;
-        @include mixins.waves-effect;
-        @include mixins.z-depth-1;
-        @include colors.color-palette();
+  button {
+    @include material.button-basic;
+    @include material.button-small;
+    @include material.waves-effect;
+    @include material.z-depth-1;
+  }
+
+  li {
+    list-style-type: none;
+  }
+
+  [name=time-remaining-progress-bar] {
+    &.ok div.vue-simple-progress-bar {
+      background-color: green !important;
     }
 
-    li {
-        list-style-type: none;
+    &.warning div.vue-simple-progress-bar {
+      background-color: yellow !important;
     }
 
-    [name=time-remaining-progress-bar] {
-        &.ok div.vue-simple-progress-bar {
-            background-color: green !important;
-        }
+    &.critical div.vue-simple-progress-bar {
+      background-color: red !important;
+    }
+  }
 
-        &.warning div.vue-simple-progress-bar {
-            background-color: yellow !important;
-        }
+  ul.token-selector-options {
+    width: 100%;
+    display: grid;
+    grid-template-rows: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-row-gap: 0.5vh;
+    padding-inline-start: 0 !important;
 
-        &.critical div.vue-simple-progress-bar {
-            background-color: red !important;
+    li.token-selector-item {
+      @include material.card;
+      @include material.card-horizontal;
+
+      span.token-name {
+        @include material.card-title;
+      }
+
+      img {
+        @include material.card-image;
+        @include material.card-horizontal-image;
+        max-width: 80px;
+      }
+
+      div.token-exchange-rate {
+        @include material.card-content;
+
+        span {
+          display: block;
+
+          &.value {
+            margin-bottom: 0.25vh;
+          }
         }
+      }
+
+      &:hover {
+        @include material.z-depth-5;
+        cursor: pointer;
+      }
+    }
+  }
+
+  div.checkout-invoice {
+    @include material.card;
+    justify-content: center;
+
+    h1 {
+      @include material.card-title;
+    }
+  }
+
+  div.payment-request {
+    @include material.card-content;
+
+    div.button-bar {
+      @include material.tab_bar();
+
+      button {
+        @include material.tab();
+      }
     }
 
-    ul.token-selector-options {
+    div.payment-route {
+      display: grid;
+      grid-template-areas: 'routing-advice'
+                            'routing-data'
+                            'routing-payment-method'
+                            'routing-timer';
+
+      display: none;
+
+      &.selected {
+        display: grid;
+      }
+    }
+
+    canvas.qr-code {
+      grid-area: routing-payment-method;
+      justify-self: center;
+      margin-top: 1vh;
+      margin: 0 auto;
+      width: 80% !important;
+      height: auto !important;
+    }
+
+    div.web3-transfer {
+      grid-area: routing-payment-method;
+      text-align: left;
+      width: 100%;
+      margin: 1vh auto;
+
+      div.amount-selector {
+        > span {
+          display: block;
+        }
+        input {
+          padding: 1em 0.5rem;
+          width: 100%;
+          display: block;
+        }
+      }
+
+      button {
+        display: block;
         width: 100%;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        grid-row-gap: 0.5vh;
-
-        li.token-selector-item {
-            @include mixins.card;
-            @include mixins.card-horizontal;
-
-            span.token-name {
-                @include mixins.card-title;
-            }
-
-            img {
-                @include mixins.card-image;
-                @include mixins.card-horizontal-image;
-            }
-
-            div.token-exchange-rate {
-                @include mixins.card-content
-            }
-
-            &:hover {
-                @include mixins.z-depth-5;
-                cursor: pointer;
-            }
-        }
+        margin: 1vh auto;
+      }
     }
 
-    div.payment-order {
-        display: grid;
+    div.blockchain-timer {
+      grid-area: routing-timer;
+      text-align: right;
 
-        grid-template-areas: 'status' 'routing';
+      &.synced.online {
+        color: material.$success-color;
 
-        h1, div.payment-order-details {
-            display: none;
-        }
+        @include material.icon-after("link")
+      }
 
-        div.payment-order-status {
-            grid-area: status;
-        }
+      &:not(.synced), &:not(.online) {
+        color: material.$error-color !important;
+      }
 
-        ul.payment-order-routing {
-            $payment_method_width: 580px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax($payment_method_width, 1fr));
-            padding-inline-start: 0;
-            grid-area: routing;
-            grid-row-gap: 2vh;
-            grid-column-gap: 0.25rem;
-
-            .transfer {
-                cursor: pointer;
-                @include mixins.icon-after('content_copy');
-            }
-
-            span.payment-method {
-                display: block;
-                text-align: center;
-                font-size: 200%;
-                font-weight: 800;
-            }
-
-            div.payment-instructions {
-                color: #505050;
-                padding-top: 1em
-            }
-
-            li.payment-method {
-                max-width: $payment_method_width;
-                height: 325px;
-                display: grid;
-                grid-template-rows: 45px auto;
-                justify-self: center;
-
-                span.payment-method {
-                    grid-area: head;
-                }
-
-                canvas {
-                    grid-area: qrcode;
-                    width: 160px !important;
-                    height: 160px !important;
-                    justify-self: center;
-                    margin-top: 1vh;
-                }
-
-                .payment-instructions {
-                    grid-area: instructions;
-
-                    .transfer.address {
-                        display: block;
-                        font-weight: 800;
-                    }
-                }
-
-                .payment-order-web3-connector {
-                    grid-area: web3connector
-                }
-
-                &.ethereum {
-                    grid-template-areas: 'head head head head'
-                                             'instructions instructions instructions instructions'
-                                             'instructions instructions instructions instructions'
-                                             'qrcode qrcode qrcode qrcode'
-                                             '. web3connector web3connector .';
-                }
-
-                &.raiden {
-                    grid-template-areas: 'head'
-                                             'instructions'
-                    '.' '.' '.';
-                }
-
-            }
-
-            dl {
-                width: 100%;
-                display: grid;
-                grid-template-columns: minmax(160px, auto) minmax(360px, auto);
-                grid-template-rows: 2.5vh;
-            }
-
-            dt, dl {
-                height: 2.5vh;
-            }
-
-            dt {
-                &::after {
-                    content: ': ';
-                }
-            }
-
-            dd {
-                display: inline;
-                text-align: right;
-                margin-inline-start: 0;
-            }
-        }
-
-        div.payment-order-timer {
-            padding: 0 1em;
-            span.time-remaining-display {
-                display: block;
-                text-align: right;
-            }
-        }
-
-        div.payment-order-action-panel {
-            padding: 2vh 1em;
-        }
-
-        div.payment-order-transfers {
-            display: none;
-        }
+      span.start-value, span.expiration-value {
+        display: none;
+      }
+      font-size: 1vh;
     }
 
-    div.checkout-receipt, div.checkout-expired {
-        display: grid;
-        justify-content: center;
-        @include mixins.flow-text;
-    }
 
-    div.checkout-receipt {
-        @include mixins.icon-after('check');
+    dl {
+      grid-area: routing-data;
+      dt {
+        &::after {
+          content: ': ';
+        }
+      }
+      dd {
+        margin-inline-start: 0;
+        margin-bottom: 0.5em;
+        padding: 1vh 0.75rem;
+        border: 1px solid color.scale(material.$input-border-color, $lightness: 70%);
+        border-radius: 4px;
+
+        span.clipboard-copier {
+          text-overflow: clip;
+          cursor: pointer;
+
+          @include material.icon-after('content_copy');
+          &::after {
+            text-align: right;
+          }
+        }
+      }
     }
+  }
+
+  div.checkout-receipt, div.checkout-expired {
+    display: grid;
+    justify-content: center;
+    @include material.typography-flow-text;
+  }
+
+  div.checkout-receipt {
+    @include material.icon-after('check');
+  }
 }

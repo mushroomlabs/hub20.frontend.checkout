@@ -4,21 +4,15 @@
     <button v-on:click="exit">Close</button>
     <Spinner v-if="!merchantStore" message="Loading payment options..." />
     <TokenSelector v-if="merchantStore && !checkout" />
-    <div v-if="merchantStore && checkout">
-      <h1>
-        Payment to <span class="store">{{ merchantStore.name }}</span>
-      </h1>
-      <PaymentRequest v-if="!isFinalized" :paymentRequest="checkout" />
-      <CheckoutReceipt v-if="isFinalized" />
-    </div>
+    <CheckoutInvoice v-if="merchantStore && checkout && !isFinalized" />
+    <CheckoutReceipt v-if="merchantStore && checkout && isFinalized" :checkout="checkout" />
   </div>
 </template>
 
 <script>
 import {mapActions, mapGetters, mapState} from 'vuex'
 
-import {components as hub20Components} from 'hub20-vue-sdk'
-
+import CheckoutInvoice from './CheckoutInvoice'
 import CheckoutReceipt from './CheckoutReceipt'
 import TokenSelector from './TokenSelector'
 import Spinner from './Spinner'
@@ -26,10 +20,13 @@ import Spinner from './Spinner'
 export default {
   name: 'checkout',
   components: {
-    PaymentRequest: hub20Components.PaymentRequest,
+    CheckoutInvoice,
     CheckoutReceipt,
     TokenSelector,
     Spinner,
+  },
+  props: {
+    debug: Boolean,
   },
   data() {
     return {
@@ -37,9 +34,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(['checkout', 'merchantStore']),
-    ...mapGetters(['isFinalized', 'payments']),
-    debug: () => process.env.NODE_ENV === 'development',
+    ...mapState('checkout', ['checkout', 'merchantStore']),
+    ...mapGetters('checkout', ['isFinalized', 'payments']),
   },
   methods: {
     ...mapActions(['refresh', 'leaveCheckout']),

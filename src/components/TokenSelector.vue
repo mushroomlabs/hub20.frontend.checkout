@@ -5,7 +5,13 @@
       {{ chargeAmount | formattedCurrency(chargeCurrencyCode) }}
     </h6>
     <ul class="token-selector-options">
-      <TokenSelectorItem v-for="token in acceptedTokens" :key="token.address" :token="token" />
+      <TokenSelectorItem
+        v-for="token in acceptedTokens"
+        :key="token.address"
+        :token="token"
+        :base-currency-code="chargeCurrencyCode"
+        :base-amount="chargeAmount"
+        />
     </ul>
   </div>
 </template>
@@ -25,7 +31,7 @@ export default {
     TokenSelectorItem,
   },
   computed: {
-    ...mapGetters(['chargeCurrencyCode', 'chargeAmount', 'acceptedTokens']),
+    ...mapGetters('checkout', ['chargeCurrencyCode', 'chargeAmount', 'acceptedTokens']),
   },
 }
 </script>
