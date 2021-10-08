@@ -1,15 +1,16 @@
-@use 'zenstyles/src/material/colors';
-@use 'zenstyles/src/material/mixins';
+@use 'sass:map';
+@use 'sass:color';
+@use 'zenstyles/src/material';
 
+@include material.ui;
 
 #hub20-checkout {
 
   button {
-    @include mixins.button;
-    @include mixins.button-small;
-    @include mixins.waves-effect;
-    @include mixins.z-depth-1;
-    @include colors.color-palette();
+    @include material.button-basic;
+    @include material.button-small;
+    @include material.waves-effect;
+    @include material.z-depth-1;
   }
 
   li {
@@ -39,165 +40,160 @@
     padding-inline-start: 0 !important;
 
     li.token-selector-item {
-      @include mixins.card;
-      @include mixins.card-horizontal;
+      @include material.card;
+      @include material.card-horizontal;
 
       span.token-name {
-        @include mixins.card-title;
+        @include material.card-title;
       }
 
       img {
-        @include mixins.card-image;
-        @include mixins.card-horizontal-image;
+        @include material.card-image;
+        @include material.card-horizontal-image;
+        max-width: 80px;
       }
 
       div.token-exchange-rate {
-        @include mixins.card-content;
+        @include material.card-content;
+
+        span {
+          display: block;
+
+          &.value {
+            margin-bottom: 0.25vh;
+          }
+        }
       }
 
       &:hover {
-        @include mixins.z-depth-5;
+        @include material.z-depth-5;
         cursor: pointer;
       }
     }
   }
 
-  div.payment-order {
-    display: grid;
+  div.checkout-invoice {
+    @include material.card;
+    justify-content: center;
 
-    grid-template-areas: 'status' 'routing';
+    h1 {
+      @include material.card-title;
+    }
+  }
 
-    h1, div.payment-order-details {
-      display: none;
+  div.payment-request {
+    @include material.card-content;
+
+    div.button-bar {
+      @include material.tab_bar();
+
+      button {
+        @include material.tab();
+      }
     }
 
-    div.payment-order-status {
-      grid-area: status;
-    }
-
-    ul.payment-order-routing {
-      $payment_method_width: 580px;
-      width: 100%;
+    div.payment-route {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax($payment_method_width, 1fr));
-      padding-inline-start: 0;
-      grid-area: routing;
-      grid-row-gap: 2vh;
-      grid-column-gap: 0.25rem;
+      grid-template-areas: 'routing-advice'
+                            'routing-data'
+                            'routing-payment-method'
+                            'routing-timer';
 
-      .transfer {
-        cursor: pointer;
-        @include mixins.icon-after('content_copy');
+      display: none;
+
+      &.selected {
+        display: grid;
+      }
+    }
+
+    canvas.qr-code {
+      grid-area: routing-payment-method;
+      justify-self: center;
+      margin-top: 1vh;
+      margin: 0 auto;
+      width: 80% !important;
+      height: auto !important;
+    }
+
+    div.web3-transfer {
+      grid-area: routing-payment-method;
+      text-align: left;
+      width: 100%;
+      margin: 1vh auto;
+
+      div.amount-selector {
+        > span {
+          display: block;
+        }
+        input {
+          padding: 1em 0.5rem;
+          width: 100%;
+          display: block;
+        }
       }
 
-      span.payment-method {
+      button {
         display: block;
-        text-align: center;
-        font-size: 200%;
-        font-weight: 800;
-      }
-
-      div.payment-instructions {
-        color: #505050;
-        padding-top: 1em
-      }
-
-      li.payment-method {
-        max-width: $payment_method_width;
-        height: 325px;
-        display: grid;
-        grid-template-rows: 45px auto;
-        justify-self: center;
-
-        span.payment-method {
-          grid-area: head;
-        }
-
-        canvas {
-          grid-area: qrcode;
-          width: 160px !important;
-          height: 160px !important;
-          justify-self: center;
-          margin-top: 1vh;
-        }
-
-        .payment-instructions {
-          grid-area: instructions;
-
-          .transfer.address {
-            display: block;
-            font-weight: 800;
-          }
-        }
-
-        .payment-order-web3-connector {
-          grid-area: web3connector
-        }
-
-        &.ethereum {
-          grid-template-areas: 'head head head head'
-                               'instructions instructions instructions instructions'
-                               'instructions instructions instructions instructions'
-                               'qrcode qrcode qrcode qrcode'
-                               '. web3connector web3connector .';
-        }
-
-        &.raiden {
-          grid-template-areas: 'head'
-                               'instructions'
-                               '.' '.' '.';
-        }
-
-      }
-
-      dl {
         width: 100%;
-        display: grid;
-        grid-template-columns: minmax(160px, auto) minmax(360px, auto);
-        grid-template-rows: 2.5vh;
+        margin: 1vh auto;
+      }
+    }
+
+    div.blockchain-timer {
+      grid-area: routing-timer;
+      text-align: right;
+
+      &.synced.online {
+        color: material.$success-color;
+
+        @include material.icon-after("link")
       }
 
-      dt, dl {
-        height: 2.5vh;
+      &:not(.synced), &:not(.online) {
+        color: material.$error-color !important;
       }
 
+      span.start-value, span.expiration-value {
+        display: none;
+      }
+      font-size: 1vh;
+    }
+
+
+    dl {
+      grid-area: routing-data;
       dt {
         &::after {
           content: ': ';
         }
       }
-
       dd {
-        display: inline;
-        text-align: right;
         margin-inline-start: 0;
+        margin-bottom: 0.5em;
+        padding: 1vh 0.75rem;
+        border: 1px solid color.scale(material.$input-border-color, $lightness: 70%);
+        border-radius: 4px;
+
+        span.clipboard-copier {
+          text-overflow: clip;
+          cursor: pointer;
+
+          @include material.icon-after('content_copy');
+          &::after {
+            text-align: right;
+          }
+        }
       }
-    }
-
-    div.payment-order-timer {
-      padding: 0 1em;
-      span.time-remaining-display {
-        display: block;
-        text-align: right;
-      }
-    }
-
-    div.payment-order-action-panel {
-      padding: 2vh 1em;
-    }
-
-    div.payment-order-transfers {
-      display: none;
     }
   }
 
   div.checkout-receipt, div.checkout-expired {
     display: grid;
     justify-content: center;
-    @include mixins.flow-text;
+    @include material.typography-flow-text;
   }
 
   div.checkout-receipt {
-    @include mixins.icon-after('check');
+    @include material.icon-after('check');
   }
 }

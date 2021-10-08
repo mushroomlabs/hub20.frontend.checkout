@@ -1,23 +1,32 @@
 <template>
   <div>
-    <Checkout v-if="isLoaded" />
+    <Checkout v-if="isLoaded" :debug="debug" />
   </div>
 </template>
 
 <script>
-import Checkout from '@/components/Checkout'
 import {mapGetters} from 'vuex'
+import Checkout from '@/components/Checkout'
 import {settings} from './settings'
 
 export default {
   components: {
-    Checkout
+    Checkout,
   },
   data() {
-    return settings
+    return {
+      serverUrl: settings.serverUrl,
+      storeId: settings.storeId,
+      amount: settings.amount,
+      currency: settings.currency,
+      debug:
+        typeof settings.debug === 'undefined'
+          ? process.env.NODE_ENV === 'development'
+          : settings.debug,
+    }
   },
   computed: {
-    ...mapGetters(['isLoaded']),
+    ...mapGetters('checkout', ['isLoaded']),
   },
   methods: {
     initializeCheckout() {
@@ -30,18 +39,17 @@ export default {
           externalIdentifier: 'Demo App',
         },
         options: {
-          onComplete: checkout => console.log(`${checkout.id} completed`)
-        }
+          onComplete: checkout => console.log(`${checkout.id} completed`),
+        },
       })
     },
   },
   mounted() {
     this.initializeCheckout()
-  }
+  },
 }
 </script>
 
-
 <style lang="scss">
-  @import './assets/styles/materialize.scss';
+@import './assets/styles/materialize.scss';
 </style>
