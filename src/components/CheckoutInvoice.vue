@@ -1,11 +1,6 @@
 <template>
   <div class="checkout-invoice">
-    <h1>
-      <slot>
-        Payment to <span class="store">{{ merchantStore.name }}</span>
-      </slot>
-    </h1>
-    <PaymentRequest :paymentRequest="checkout" />
+    <Invoice :paymentRequest="checkout" />
   </div>
 </template>
 
@@ -17,7 +12,7 @@ import {components as hub20Components} from 'hub20-vue-sdk'
 export default {
   name: 'checkout-invoice',
   components: {
-    PaymentRequest: hub20Components.PaymentRequest,
+    Invoice: hub20Components.Payment.Invoice,
   },
   computed: {
     ...mapState('checkout', ['checkout', 'merchantStore']),

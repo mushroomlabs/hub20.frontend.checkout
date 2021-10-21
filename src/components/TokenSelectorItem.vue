@@ -1,7 +1,7 @@
 <template>
   <li v-if="token" v-on:click="selectToken" class="token-selector-item">
     <span class="token-name">{{ token.name }}</span>
-    <img v-if="tokenLogo" :src="tokenLogo" :alt="token.name" />
+    <TokenLogo :token="token" />
     <div class="token-exchange-rate">
       <span class="rate">
         Current Rate:
@@ -24,6 +24,9 @@ import {filters as hub20filters, mixins, components} from 'hub20-vue-sdk'
 export default {
   name: 'TokenSelectorItem',
   mixins: [mixins.TokenMixin],
+  components: {
+    TokenLogo: components.TokenLogo,
+  },
   filters: {
     formattedCurrency: hub20filters.formattedCurrency,
     formattedAmount: hub20filters.formattedAmount,
@@ -42,22 +45,15 @@ export default {
         return 0
       }
 
-      return this.baseAmount / this.tokenExchangeRate
+      return Number(this.baseAmount / this.tokenExchangeRate).toFixed(this.token.decimals)
     },
-    tokenLogo() {
-      return this.tokenLogoByAddress(this.token.address)
-    },
-    ...mapGetters('coingecko', ['exchangeRate', 'tokenLogoByAddress']),
+    ...mapGetters('coingecko', ['exchangeRate']),
   },
   methods: {
-    ...mapActions('checkout', ['startCheckout']),
-    ...mapActions('coingecko', ['fetchTokenLogoUrl']),
+    ...mapActions('checkout', {startCheckout: 'start'}),
     selectToken: function() {
-      this.startCheckout(this.token)
+      this.startCheckout({token: this.token, tokenAmount: this.tokenAmount})
     },
-  },
-  mounted() {
-    this.fetchTokenLogoUrl(this.token)
   },
 }
 </script>

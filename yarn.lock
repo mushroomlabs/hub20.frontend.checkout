@@ -8338,6 +8338,11 @@ pkg-dir@^4.1.0:
   dependencies:
     find-up "^4.0.0"
 
+pluralize@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
+  integrity sha512-ARhBOdzS3e41FbkW/XWrTEtukqqLoK5+Z/4UeDaLuSW+39JPeFgs4gCGqsrJHVZX0fUrx//4OF0K1CUGwlIFow==
+
 pn@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pn/-/pn-1.1.0.tgz#e2f4cef0e219f463c179ab37463e4e1ecdccbafb"
@@ -10744,6 +10749,13 @@ vue-moment@^4.1.0:
   integrity sha512-Gzisqpg82ItlrUyiD9d0Kfru+JorW2o4mQOH06lEDZNgxci0tv/fua1Hl0bo4DozDV2JK1r52Atn/8QVCu8qQw==
   dependencies:
     moment "^2.19.2"
+
+vue-pluralize@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/vue-pluralize/-/vue-pluralize-0.0.2.tgz#61310447e6e7c9cdb073c164dc36b014cae96484"
+  integrity sha512-NT4Uv/j40yO+yCLIij4nZl9csaXemTqNekYxk7mH+L4t2HZhiJxcg0tc/Q3X6gKv3iaY46Vhz/edDBuH2E6F6w==
+  dependencies:
+    pluralize "^7.0.0"
 
 vue-simple-progress@^1.1.1:
   version "1.1.1"

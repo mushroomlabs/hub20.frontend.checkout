@@ -1,19 +1,18 @@
 <template>
-  <div v-if="chargeCurrencyCode && chargeAmount" class="token-selector">
-    <h6 class="token-selector-payment-info">
-      Select one of the following tokens to initiate a transfer equivalent to
-      {{ chargeAmount | formattedCurrency(chargeCurrencyCode) }}
-    </h6>
-    <ul class="token-selector-options">
-      <TokenSelectorItem
-        v-for="token in acceptedTokens"
-        :key="token.address"
-        :token="token"
-        :base-currency-code="chargeCurrencyCode"
-        :base-amount="chargeAmount"
-        />
-    </ul>
-  </div>
+<div v-if="chargeCurrencyCode && chargeAmount" class="token-selector">
+  <slot>
+    <span class="call-to-action">Select the currency to be used for payment</span>
+  </slot>
+  <ul class="token-selector-options">
+    <TokenSelectorItem
+      v-for="token in acceptedTokens"
+      :key="token.address"
+      :token="token"
+      :base-currency-code="chargeCurrencyCode"
+      :base-amount="chargeAmount"
+      />
+  </ul>
+</div>
 </template>
 
 <script>

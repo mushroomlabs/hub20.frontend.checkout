@@ -1,34 +1,73 @@
 @use 'sass:map';
 @use 'sass:color';
+@use 'sass:math';
 @use 'zenstyles/src/material';
+
+$minimum_width: 480px;
+$vertical_padding: 0.25em;
+$lateral_padding: 0.5rem;
+$section_base_height: 3em;
+$section_divider_color: color.scale(material.$input-border-color, $lightness: 80%);
+
 
 @include material.ui;
 
-#hub20-checkout {
+@mixin checkout-section {
+  border: 1px solid $section_divider_color;
+  margin-bottom: -1px;
+  min-width: $minimum_width;
+}
 
+@mixin checkout-info-display {
+  @include checkout-section;
+  display: grid;
+  grid-template-areas: 'label data'
+                       '. .';
+  grid-template-rows: repeat(auto-fit, minmax(3em, 1fr));
+  grid-template-columns: auto-fill(240px) 1fr;
+  align-content: space-between;
+  align-items: center;
+  padding: 1em $lateral_padding;
+}
+
+@mixin checkout-field-label {
+  grid-area: label;
+  font-weight: bold;
+  grid-column: 1;
+}
+
+@mixin checkout-field-data {
+  grid-area: data;
+  grid-column: 2;
+  font-weight: 200;
+  text-align: right;
+}
+
+@mixin clipboard-copy {
+  display: inline-grid;
+  width: 100%;
+  grid-template-columns: 1fr 2em;
+  text-overflow: clip;
+  cursor: pointer;
+
+  @include material.icon-after('content_copy');
+  &::after {
+    align-self: center;
+  }
+}
+
+
+#hub20-checkout {
   button {
-    @include material.button-basic;
     @include material.button-small;
-    @include material.waves-effect;
-    @include material.z-depth-1;
+  }
+
+  span.clipboard-copier {
+    @include clipboard-copy;
   }
 
   li {
     list-style-type: none;
-  }
-
-  [name=time-remaining-progress-bar] {
-    &.ok div.vue-simple-progress-bar {
-      background-color: green !important;
-    }
-
-    &.warning div.vue-simple-progress-bar {
-      background-color: yellow !important;
-    }
-
-    &.critical div.vue-simple-progress-bar {
-      background-color: red !important;
-    }
   }
 
   ul.token-selector-options {
@@ -42,6 +81,7 @@
     li.token-selector-item {
       @include material.card;
       @include material.card-horizontal;
+      margin: 0.25em $lateral_padding;
 
       span.token-name {
         @include material.card-title;
@@ -72,16 +112,107 @@
     }
   }
 
-  div.checkout-invoice {
-    @include material.card;
-    justify-content: center;
+  div.payment-summary-display {
+    @include checkout-info-display;
 
-    h1 {
-      @include material.card-title;
+
+    span.summary-text {
+      @include checkout-field-label;
+    }
+
+    span.summary-value {
+      @include checkout-field-data;
+    }
+
+    div.payment-tracker {
+      grid-column: 1 / span 2;
+    }
+
+    ul.incoming-payments {
+      padding-inline-start: 0;
+      width: 100%;
+
+      li {
+        display: grid;
+        grid-template-columns: 80% auto;
+        align-content: space-between;
+
+        a.identifier, span.identifier {
+          justify-self: right;
+          display: block;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          text-align: right;
+          max-width: 10em;
+        }
+
+        &.confirmed {
+          span.amount-value {
+            @include material.icon-after('check');
+          }
+        }
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:not(.expanded){
+      span.identifier {
+        grid-column-end: span 2;
+      }
+
+      span.summary {
+        display: unset;
+      }
+      div.payment-tracker {
+        display: none;
+      }
+    }
+  }
+
+  div.payment-token-display {
+    @include checkout-info-display;
+    border-bottom: 1px solid $section_divider_color;
+
+    span.payment-token-text {
+      @include checkout-field-label;
+    }
+
+    span.payment-token-value {
+      @include checkout-field-data;
+
+      display: inline-grid;
+      grid-template-areas: 'logo token-name token-code';
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+
+      span.token-name {
+        grid-area: token-name;
+        padding: 0 $lateral_padding;
+      }
+
+      span.token-code {
+        grid-area: token-code;
+        &::before {
+          content: '(';
+        }
+        &::after {
+          content: ')';
+        }
+      }
+
+      img {
+        grid-area: logo;
+        height: $section_base_height;
+        justify-self: right;
+      }
     }
   }
 
   div.payment-request {
+    @include checkout-section;
     @include material.card-content;
 
     div.button-bar {
@@ -94,106 +225,113 @@
 
     div.payment-route {
       display: grid;
-      grid-template-areas: 'routing-advice'
-                            'routing-data'
-                            'routing-payment-method'
-                            'routing-timer';
+      grid-template-areas: 'routing-timer'
+                           'routing-advice'
+                           'routing-data'
+                           'routing-payment-method'
+                           'routing-payment-method';
 
       display: none;
+      padding: 1em 4 * $lateral_padding;
+      max-width: 1.5 * $minimum_width;
+      margin: 0 auto;
 
       &.selected {
         display: grid;
       }
-    }
 
-    canvas.qr-code {
-      grid-area: routing-payment-method;
-      justify-self: center;
-      margin-top: 1vh;
-      margin: 0 auto;
-      width: 80% !important;
-      height: auto !important;
-    }
+      .payment-route-detail {
+        grid-area: routing-data;
 
-    div.web3-transfer {
-      grid-area: routing-payment-method;
-      text-align: left;
-      width: 100%;
-      margin: 1vh auto;
-
-      div.amount-selector {
         > span {
           display: block;
         }
         input {
-          padding: 1em 0.5rem;
+          padding: 1em $lateral_padding;
           width: 100%;
           display: block;
         }
+
+        dl {
+          grid-area: routing-data;
+          dt {
+            &::after {
+              content: ': ';
+            }
+          }
+          dd {
+            margin-inline-start: 0;
+            margin-bottom: 0.5em;
+            padding: 1vh 0.75rem;
+            border: 1px solid color.scale(material.$input-border-color, $lightness: 70%);
+            border-radius: 4px;
+          }
+        }
+
       }
 
-      button {
-        display: block;
+      .wallet-option {
+        grid-area: routing-payment-method;
+
+        > span {
+          display: none;
+        }
         width: 100%;
         margin: 1vh auto;
-      }
-    }
 
-    div.blockchain-timer {
-      grid-area: routing-timer;
-      text-align: right;
-
-      &.synced.online {
-        color: material.$success-color;
-
-        @include material.icon-after("link")
-      }
-
-      &:not(.synced), &:not(.online) {
-        color: material.$error-color !important;
-      }
-
-      span.start-value, span.expiration-value {
-        display: none;
-      }
-      font-size: 1vh;
-    }
-
-
-    dl {
-      grid-area: routing-data;
-      dt {
-        &::after {
-          content: ': ';
+        canvas.qr-code {
+          display: block;
+          max-width: math.div($minimum_width, 2);
+          margin: 0 auto;
         }
       }
-      dd {
-        margin-inline-start: 0;
-        margin-bottom: 0.5em;
-        padding: 1vh 0.75rem;
-        border: 1px solid color.scale(material.$input-border-color, $lightness: 70%);
-        border-radius: 4px;
 
-        span.clipboard-copier {
-          text-overflow: clip;
-          cursor: pointer;
+      .blockchain-route-countdown {
+        $line-height: 2em;
+        grid-area: routing-timer;
 
-          @include material.icon-after('content_copy');
-          &::after {
-            text-align: right;
+        display: grid;
+        grid-template-areas: 'spinner .'
+                             'spinner status'
+                             'spinner .';
+        grid-template-columns: $line-height auto;
+        margin-top: 2 * $vertical_padding;
+        padding: $vertical_padding $lateral_padding;
+
+        span.status-message {
+          grid-area: status;
+          margin-left: 1rem;
+        }
+
+        .blockchain-route-countdown-circle {
+          grid-area: spinner;
+          width: $line-height;
+          height: $line-height;
+
+          circle {
+            stroke: transparent;
+          }
+
+          path {
+            @keyframes dash {
+              50% {
+                stroke-dasharray: 90, 150;
+                stroke-dashoffset: -35;
+              }
+              100% {
+                transform: rotate(360deg);
+                stroke-dashoffset: 0;
+              }
+            }
+
+            animation: dash 2s ease-in-out infinite;
+          }
+
+          span.label {
+            display: none;
           }
         }
       }
     }
-  }
-
-  div.checkout-receipt, div.checkout-expired {
-    display: grid;
-    justify-content: center;
-    @include material.typography-flow-text;
-  }
-
-  div.checkout-receipt {
-    @include material.icon-after('check');
   }
 }

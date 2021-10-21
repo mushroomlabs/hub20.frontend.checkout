@@ -1,45 +1,31 @@
 <template>
-  <div>
-    <Checkout v-if="isLoaded" :debug="debug" />
-  </div>
+<div class="demo">
+
+</div>
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
-import Checkout from '@/components/Checkout'
 import {settings} from './settings'
 
+import {checkout} from '../lib/main'
+
 export default {
-  components: {
-    Checkout,
-  },
-  data() {
-    return {
-      serverUrl: settings.serverUrl,
-      storeId: settings.storeId,
-      amount: settings.amount,
-      currency: settings.currency,
-      debug:
-        typeof settings.debug === 'undefined'
-          ? process.env.NODE_ENV === 'development'
-          : settings.debug,
-    }
-  },
-  computed: {
-    ...mapGetters('checkout', ['isLoaded']),
-  },
   methods: {
     initializeCheckout() {
-      this.$store.dispatch('initialize', {
-        serverUrl: this.serverUrl,
-        storeId: this.storeId,
+      new checkout('div.demo', {
+        serverUrl: settings.serverUrl,
+        storeId: settings.storeId,
         charge: {
-          amount: this.amount,
-          currencyCode: this.currency,
+          amount: settings.amount,
+          currencyCode: settings.currency,
           externalIdentifier: 'Demo App',
         },
         options: {
           onComplete: checkout => console.log(`${checkout.id} completed`),
+          onExpired: checkout => console.log(`${checkout.id} expired`),
+          onClose: () => console.log(`${checkout.id} closed`),
+          onOpen: () => console.log(`${checkout.id} opened`),
+          onCancel: checkout => console.log(`${checkout.id} canceled!`),
         },
       })
     },
