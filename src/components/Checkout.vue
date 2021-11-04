@@ -1,15 +1,20 @@
 <template>
-  <div v-if="isLoaded" id="hub20-checkout">
+  <div v-if="isLoaded && isOpen" :class="{minimized: isMinimized}" id="hub20-checkout">
     <span class="store">{{ merchantStore.name }}</span>
     <div class="charge-details-display">
       <span class="charge-amount-text">Total Due:</span>
       <span class="charge-amount-value">{{ chargeAmount | formattedCurrency(chargeCurrencyCode) }}</span>
     </div>
     <TokenSelector v-if="!checkout" />
-    <CheckoutPaymentToken v-if="paymentToken" :token="paymentToken" />
-    <CheckoutPaymentSummary v-if="checkout" />
-    <Invoice v-if="checkout && !isFinalized" :paymentRequest="checkout" />
-    <CheckoutActionPanel />
+    <div v-if="checkout" class="checkout-payment-display">
+      <CheckoutPaymentToken v-if="paymentToken" :token="paymentToken" />
+      <CheckoutPaymentSummary v-if="checkout" />
+      <Invoice v-if="!isPaid" :paymentRequest="checkout" />
+      <CheckoutReceipt v-if="isPaid || isFinalized" :onClose="close"/>
+    </div>
+    <div v-if="checkout">
+      <CheckoutActionPanel :onClose="close" :onCancel="cancel" />
+    </div>
   </div>
 </template>
 
@@ -45,10 +50,42 @@ export default {
   },
   props: {
     debug: Boolean,
+    onCheckoutComplete: {
+      type: Function,
+      required: false,
+      default: null
+    },
+    onCheckoutExpired: {
+      type: Function,
+      required: false,
+      default: null
+    },
+    onCheckoutCanceled: {
+      type: Function,
+      required: false,
+      default: null
+    },
+    onOpen: {
+      type: Function,
+      required: false,
+      default: null
+    },
+    onClose: {
+      type: Function,
+      required: false,
+      default: null
+    },
+    onMinimize: {
+      type: Function,
+      required: false,
+      default: null
+    },
   },
   data() {
     return {
       timerId: null,
+      isOpen: true,
+      isMinimized: false
     }
   },
   computed: {
@@ -56,6 +93,7 @@ export default {
     ...mapGetters('checkout', [
       'isLoaded',
       'isFinalized',
+      'isPaid',
       'payments',
       'chargeCurrencyCode',
       'chargeAmount',
@@ -66,6 +104,38 @@ export default {
   },
   methods: {
     ...mapActions(['refresh']),
+    ...mapActions('checkout', ['reset']),
+    cancel() {
+      if (this.onCheckoutCanceled) {
+        this.onCheckoutCanceled(this.checkout)
+      }
+
+      this.reset()
+    },
+    close() {
+      this.isOpen = false
+      this.isMinimized = false
+
+      if (this.onClose) {
+        this.onClose(this.checkout)
+      }
+    },
+    minimize() {
+      this.isMinimized = true
+
+      if (this.onMinimize) {
+        this.onMinimize(this.checkout)
+      }
+    },
+    open() {
+      this.isOpen = true
+      this.isMinimized = false
+
+      if (this.onOpen) {
+        this.onOpen(this.checkout)
+      }
+    }
+
   },
   mounted() {
     this.timerId = setInterval(this.refresh, 15 * 1000)

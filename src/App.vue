@@ -23,9 +23,7 @@ export default {
         options: {
           onComplete: checkout => console.log(`${checkout.id} completed`),
           onExpired: checkout => console.log(`${checkout.id} expired`),
-          onClose: () => console.log(`${checkout.id} closed`),
-          onOpen: () => console.log(`${checkout.id} opened`),
-          onCancel: checkout => console.log(`${checkout.id} canceled!`),
+          onCancel: checkout => console.log(`${checkout.id} canceled!`)
         },
       })
     },
