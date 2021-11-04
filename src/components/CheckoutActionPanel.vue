@@ -1,9 +1,10 @@
 <template>
   <div class="checkout-action-panel">
     <button v-if="isOpen" @click="reset">Back</button>
-    <button v-if="isFinalized" @click="close">Close</button>
-    <button v-if="hasPartialPayment" @click="leave">Leave</button>
-    <div v-if="prompted" @class="confirmation - prompt">
+    <button
+      v-if="hasPartialPayment"
+      @click="promptConfirmation(reset, 'Your payments are not enough to complete the purchase. Leave anyway?')">Leave</button>
+    <div v-if="prompted" class="confirmation-prompt">
       <span>{{ actionMessagePrompt }}</span>
       <button class="cancel-action" @click="reject">No</button>
       <button class="confirm-action" @click="confirm">Yes</button>
@@ -20,7 +21,13 @@ export default {
   name: 'checkout-action-panel',
   computed: {
     ...mapState('checkout', ['checkout']),
-    ...mapGetters('checkout', ['hasPartialPayment', 'isOpen', 'isFinalized']),
+    ...mapGetters('checkout', ['hasPartialPayment', 'isOpen']),
+  },
+  props: {
+    onClose: {
+      type: Function,
+      default: () => this.$emit('checkout-closed')
+    }
   },
   data() {
     return {
@@ -30,13 +37,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['close']),
     ...mapActions('checkout', ['reset']),
-    leave() {
-      this.prompted = true
-      this.action = this.reset
-      this.actionMessagePrompt =
-        'Your payments are not enough to complete the purchase. Leave anyway?'
+    promptConfirmation(message, action) {
+      this.promptConfirmation = true
+      this.action = action
+      this.actionMessagePrompt = message
     },
     reject() {
       this.prompted = false
@@ -50,7 +55,7 @@ export default {
       this.prompted = false
       this.action()
       this.actionMessagePrompt = DEFAULT_MESSAGE_CONFIRMATION
-    },
+    }
   },
 }
 </script>
